@@ -25,11 +25,15 @@ const schema = yup.object({
     then: (s) => s.oneOf(FREQUENCIES).required("Select a frequency"),
     otherwise: (s) => s.optional(),
   }),
-  recurringInterval:  yup.number().when(["recurring", "recurringFrequency"], {
-    is: (recurring, freq) => recurring && freq === "custom",
-    then: (s) => s.typeError("Enter a number").min(1).required("Enter interval in days"),
-    otherwise: (s) => s.optional(),
-  }),
+  recurringInterval:  yup.mixed()
+    .transform((v) => (v === "" || v === null || v === undefined ? undefined : Number(v)))
+    .when(["recurring", "recurringFrequency"], {
+      is: (recurring, freq) => recurring && freq === "custom",
+      then: (s) => s
+        .required("Enter interval in days")
+        .test("is-positive-int", "Must be at least 1 day", (v) => Number.isInteger(Number(v)) && Number(v) >= 1),
+      otherwise: (s) => s.optional(),
+    }),
 });
 
 export default function AddTransaction() {
@@ -54,7 +58,7 @@ export default function AddTransaction() {
       notes:     existing?.notes     || "",
       recurring:          existing?.recurring          || false,
       recurringFrequency: existing?.recurringFrequency || "monthly",
-      recurringInterval:  existing?.recurringInterval  || "",
+      recurringInterval:  existing?.recurringInterval  ?? undefined,
     },
   });
 
