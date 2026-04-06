@@ -5,10 +5,9 @@ import { MdEdit, MdDelete, MdRepeat } from "react-icons/md";
 import { toast } from "react-toastify";
 import { useFinance } from "../context/FinanceContext";
 import { CATEGORIES } from "../constants/categories";
-import { formatINR } from "../utils/currencyFormatter";
 
 export default function TransactionCard({ transaction }) {
-  const { deleteTransaction } = useFinance();
+  const { deleteTransaction, fmt } = useFinance();
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -63,7 +62,7 @@ export default function TransactionCard({ transaction }) {
           fontWeight: 700, fontSize: 15,
           color: isExpense ? "#e85d5d" : "#4a90d9",
         }}>
-          {isExpense ? "- " : "+ "}{formatINR(transaction.amount)}
+          {isExpense ? "- " : "+ "}{fmt(transaction.amount)}
         </div>
         <div style={{ fontSize: 11, color: "#555", marginTop: 2 }}>
           {format(parseISO(transaction.date), "hh:mm a")}

@@ -8,7 +8,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import SearchBar from "../components/SearchBar";
 import Filters from "../components/Filters";
 import TransactionCard from "../components/TransactionCard";
-import { formatINR } from "../utils/currencyFormatter";
+import { useFinance } from "../context/FinanceContext";
 
 const DEFAULT_FILTERS = {
   category: "", type: "", sortBy: "date-desc", startDate: "", endDate: "",
@@ -16,6 +16,7 @@ const DEFAULT_FILTERS = {
 
 export default function Transactions() {
   const navigate = useNavigate();
+  const { fmt } = useFinance();
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
@@ -48,17 +49,17 @@ export default function Transactions() {
       <div className="summary-bar">
         <div>
           <div className="label">Income</div>
-          <div className="value income">{formatINR(monthlyTotals.income)}</div>
+          <div className="value income">{fmt(monthlyTotals.income)}</div>
         </div>
         <div>
           <div className="label">Expenses</div>
-          <div className="value expense">{formatINR(monthlyTotals.expenses)}</div>
+          <div className="value expense">{fmt(monthlyTotals.expenses)}</div>
         </div>
         <div>
           <div className="label">Total</div>
           <div className="value net"
             style={{ color: monthlyTotals.net >= 0 ? "#4a90d9" : "#e85d5d" }}>
-            {formatINR(monthlyTotals.net)}
+            {fmt(monthlyTotals.net)}
           </div>
         </div>
       </div>
@@ -115,7 +116,7 @@ export default function Transactions() {
                       {format(parseISO(date), "EEE, dd MMM yyyy")}
                     </span>
                     <span className="day-total">
-                      {dayTotal > 0 ? `- ${formatINR(dayTotal)}` : ""}
+                      {dayTotal > 0 ? `- ${fmt(dayTotal)}` : ""}
                     </span>
                   </div>
                   <div className="card" style={{ padding: "0 14px" }}>

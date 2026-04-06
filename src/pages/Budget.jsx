@@ -2,12 +2,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { useBudget } from "../hooks/useBudget";
-import { formatINR } from "../utils/currencyFormatter";
+import { useFinance } from "../context/FinanceContext";
 
 const STATUS_COLORS = { safe: "#2ecc71", warning: "#f5a623", danger: "#e85d5d" };
 
 export default function Budget() {
   const { spent, remaining, percentage, status, byCategory, budget, setBudget } = useBudget();
+  const { currency, fmt } = useFinance();
   const [input, setInput] = useState(budget.monthlyBudget || "");
   const color = STATUS_COLORS[status];
 
@@ -29,7 +30,7 @@ export default function Budget() {
 
       {/* Set budget */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <p style={{ fontSize: 13, color: "#888", marginBottom: 10 }}>Monthly budget (₹)</p>
+        <p style={{ fontSize: 13, color: "#888", marginBottom: 10 }}>Monthly budget ({currency})</p>
         <div style={{ display: "flex", gap: 10 }}>
           <input type="number" value={input} onChange={(e) => setInput(e.target.value)}
             placeholder="e.g. 50000" className="input" style={{ flex: 1 }} />
@@ -69,9 +70,9 @@ export default function Budget() {
             {/* Stats grid */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
               {[
-                { label: "Budget",    value: formatINR(budget.monthlyBudget), color: "#fff" },
-                { label: "Spent",     value: formatINR(spent),                color: "#e85d5d" },
-                { label: "Remaining", value: formatINR(remaining),            color },
+                { label: "Budget",    value: fmt(budget.monthlyBudget), color: "#fff" },
+                { label: "Spent",     value: fmt(spent),                color: "#e85d5d" },
+                { label: "Remaining", value: fmt(remaining),            color },
               ].map(({ label, value, color: c }) => (
                 <div key={label} style={{ textAlign: "center", background: "#2e2e2e",
                   borderRadius: 10, padding: "12px 8px" }}>
@@ -116,7 +117,7 @@ export default function Budget() {
                       alignItems: "center", marginBottom: 6 }}>
                       <span style={{ fontSize: 13 }}>{cat.emoji} {cat.name}</span>
                       <span style={{ fontSize: 13, fontWeight: 600, color: cat.color }}>
-                        {formatINR(cat.total)}
+                        {fmt(cat.total)}
                         <span style={{ fontSize: 11, color: "#666", marginLeft: 4 }}>
                           ({pct}%)
                         </span>

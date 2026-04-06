@@ -7,15 +7,12 @@ import PieChart from "../components/Charts/PieChart";
 import BarChart from "../components/Charts/BarChart";
 import LineChart from "../components/Charts/LineChart";
 import TransactionCard from "../components/TransactionCard";
-import { formatINR } from "../utils/currencyFormatter";
 import { CATEGORIES } from "../constants/categories";
-import { useCurrency } from "../hooks/useCurrency";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { transactions } = useFinance();
+  const { transactions, fmt } = useFinance();
   const { monthlyTotals } = useTransactions();
-  const { convert, loading: ratesLoading } = useCurrency("INR");
 
   const recent = transactions.slice(0, 5);
 
@@ -64,17 +61,10 @@ export default function Dashboard() {
         ].map(({ label, value, color }) => (
           <div key={label} className="card" style={{ textAlign: "center", padding: "14px 8px" }}>
             <p style={{ fontSize: 11, color: "#666", marginBottom: 6 }}>{label}</p>
-            <p style={{ fontSize: 13, fontWeight: 700, color }}>{formatINR(value)}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color }}>{fmt(value)}</p>
           </div>
         ))}
       </div>
-
-      {/* Currency hint */}
-      {!ratesLoading && monthlyTotals.expenses > 0 && (
-        <p style={{ fontSize: 11, color: "#555", textAlign: "center", marginBottom: 16, marginTop: 8 }}>
-          ≈ ${convert(monthlyTotals.expenses, "USD").toFixed(2)} USD spent this month
-        </p>
-      )}
 
       {/* Budget card */}
       <div style={{ marginBottom: 20 }}>

@@ -6,6 +6,7 @@ import Transactions from "./pages/Transactions";
 import AddTransaction from "./pages/AddTransaction";
 import Budget from "./pages/Budget";
 import Analytics from "./pages/Analytics";
+import Currency from "./pages/Currency";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
               <Route path="/transactions/edit/:id" element={<AddTransaction />} />
               <Route path="/budget" element={<Budget />} />
               <Route path="/analytics" element={<Analytics />} />
+              <Route path="/currency" element={<Currency />} />
             </Routes>
           </AnimatePresence>
         </div>

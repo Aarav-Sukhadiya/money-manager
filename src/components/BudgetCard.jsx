@@ -1,5 +1,5 @@
 import { useBudget } from "../hooks/useBudget";
-import { formatINR } from "../utils/currencyFormatter";
+import { useFinance } from "../context/FinanceContext";
 
 const STATUS_COLORS = {
   safe:    "#2ecc71",
@@ -9,6 +9,7 @@ const STATUS_COLORS = {
 
 export default function BudgetCard() {
   const { spent, remaining, percentage, status, budget } = useBudget();
+  const { fmt } = useFinance();
   const color = STATUS_COLORS[status];
 
   if (!budget.monthlyBudget) {
@@ -41,9 +42,9 @@ export default function BudgetCard() {
       {/* Stats row */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 14 }}>
         {[
-          { label: "Budget",    value: formatINR(budget.monthlyBudget), color: "#fff" },
-          { label: "Spent",     value: formatINR(spent),                color: "#e85d5d" },
-          { label: "Remaining", value: formatINR(remaining),            color: color },
+          { label: "Budget",    value: fmt(budget.monthlyBudget), color: "#fff" },
+          { label: "Spent",     value: fmt(spent),                color: "#e85d5d" },
+          { label: "Remaining", value: fmt(remaining),            color: color },
         ].map(({ label, value, color: c }) => (
           <div key={label} style={{ textAlign: "center" }}>
             <div style={{ fontSize: 11, color: "#666", marginBottom: 3 }}>{label}</div>

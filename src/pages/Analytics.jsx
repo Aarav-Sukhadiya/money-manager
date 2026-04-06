@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useFinance } from "../context/FinanceContext";
-import { useTransactions } from "../hooks/useTransactions";
 import PieChart from "../components/Charts/PieChart";
 import BarChart from "../components/Charts/BarChart";
 import LineChart from "../components/Charts/LineChart";
-import { formatINR } from "../utils/currencyFormatter";
 import { CATEGORIES } from "../constants/categories";
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, parseISO, isWithinInterval } from "date-fns";
 
 export default function Analytics() {
   const [view, setView] = useState("monthly");
-  const { transactions } = useFinance();
+  const { transactions, fmt } = useFinance();
 
   const now = new Date();
   const range = view === "monthly"
@@ -74,7 +72,7 @@ export default function Analytics() {
         ].map(({ label, value, color }) => (
           <div key={label} className="card" style={{ textAlign: "center", padding: "14px 8px" }}>
             <p style={{ fontSize: 11, color: "#666", marginBottom: 6 }}>{label}</p>
-            <p style={{ fontSize: 13, fontWeight: 700, color }}>{formatINR(value)}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color }}>{fmt(value)}</p>
           </div>
         ))}
       </div>
@@ -90,7 +88,7 @@ export default function Analytics() {
             </p>
           </div>
           <p style={{ fontSize: 16, fontWeight: 700, color: topCat.color }}>
-            {formatINR(topCat.total)}
+            {fmt(topCat.total)}
           </p>
         </div>
       )}
@@ -142,7 +140,7 @@ export default function Analytics() {
                   marginBottom: 4 }}>
                   <span style={{ fontSize: 13, fontWeight: 600 }}>{cat.name}</span>
                   <span style={{ fontSize: 13, fontWeight: 700, color: cat.color }}>
-                    {formatINR(cat.total)}
+                    {fmt(cat.total)}
                   </span>
                 </div>
                 <div style={{ background: "#2e2e2e", borderRadius: 99,

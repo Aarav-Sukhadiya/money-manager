@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -24,7 +23,7 @@ const schema = yup.object({
 export default function AddTransaction() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { transactions, addTransaction, updateTransaction } = useFinance();
+  const { transactions, addTransaction, updateTransaction, currency, toBase } = useFinance();
 
   const existing = id ? transactions.find((t) => t.id === id) : null;
   const isEdit = Boolean(existing);
@@ -50,7 +49,7 @@ export default function AddTransaction() {
   function onSubmit(data) {
     const payload = {
       ...data,
-      amount: parseFloat(data.amount),
+      amount: toBase(parseFloat(data.amount)),
       date:   new Date(data.date).toISOString(),
     };
 
@@ -125,7 +124,7 @@ export default function AddTransaction() {
 
           {/* Amount */}
           <div style={{ marginBottom: 16 }}>
-            <label style={labelStyle}>Amount (₹)</label>
+            <label style={labelStyle}>Amount ({currency})</label>
             <input {...register("amount")} type="number" step="0.01"
               placeholder="0.00" style={inputStyle} />
             {errors.amount && <p className="error-text">{errors.amount.message}</p>}
