@@ -9,15 +9,27 @@ import { MdArrowBack } from "react-icons/md";
 import { useFinance } from "../context/FinanceContext";
 import { CATEGORIES } from "../constants/categories";
 
+const FREQUENCIES = ["weekly", "monthly", "yearly", "custom"];
+
 const schema = yup.object({
-  type:      yup.string().oneOf(["expense", "income"]).required(),
-  title:     yup.string().required("Title is required").min(2, "Too short"),
-  amount:    yup.number().typeError("Enter a valid amount")
-               .positive("Must be positive").required("Amount is required"),
-  category:  yup.string().required("Pick a category"),
-  date:      yup.string().required("Date is required"),
-  notes:     yup.string(),
-  recurring: yup.boolean(),
+  type:               yup.string().oneOf(["expense", "income"]).required(),
+  title:              yup.string().required("Title is required").min(2, "Too short"),
+  amount:             yup.number().typeError("Enter a valid amount")
+                        .positive("Must be positive").required("Amount is required"),
+  category:           yup.string().required("Pick a category"),
+  date:               yup.string().required("Date is required"),
+  notes:              yup.string(),
+  recurring:          yup.boolean(),
+  recurringFrequency: yup.string().when("recurring", {
+    is: true,
+    then: (s) => s.oneOf(FREQUENCIES).required("Select a frequency"),
+    otherwise: (s) => s.optional(),
+  }),
+  recurringInterval:  yup.number().when(["recurring", "recurringFrequency"], {
+    is: (recurring, freq) => recurring && freq === "custom",
+    then: (s) => s.typeError("Enter a number").min(1).required("Enter interval in days"),
+    otherwise: (s) => s.optional(),
+  }),
 });
 
 export default function AddTransaction() {
@@ -40,7 +52,9 @@ export default function AddTransaction() {
                    ? format(new Date(existing.date), "yyyy-MM-dd")
                    : format(new Date(), "yyyy-MM-dd"),
       notes:     existing?.notes     || "",
-      recurring: existing?.recurring || false,
+      recurring:          existing?.recurring          || false,
+      recurringFrequency: existing?.recurringFrequency || "monthly",
+      recurringInterval:  existing?.recurringInterval  || "",
     },
   });
 
@@ -50,7 +64,10 @@ export default function AddTransaction() {
     const payload = {
       ...data,
       amount: toBase(parseFloat(data.amount)),
-      date:   new Date(data.date).toISOString(),
+      date:   data.date,
+      recurringFrequency: data.recurring ? data.recurringFrequency : undefined,
+      recurringInterval:  data.recurring && data.recurringFrequency === "custom"
+                            ? parseInt(data.recurringInterval, 10) : undefined,
     };
 
     if (isEdit) {
@@ -173,30 +190,76 @@ export default function AddTransaction() {
           </div>
 
           {/* Recurring toggle */}
-          <div style={{ display: "flex", justifyContent: "space-between",
-            alignItems: "center", marginBottom: 28,
+          <div style={{ marginBottom: watch("recurring") ? 12 : 28,
             background: "#2e2e2e", borderRadius: 10, padding: "14px 16px" }}>
-            <div>
-              <p style={{ fontSize: 14, fontWeight: 600 }}>Recurring</p>
-              <p style={{ fontSize: 12, color: "#666" }}>
-                e.g. rent, subscriptions, EMIs
-              </p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 600 }}>Recurring</p>
+                <p style={{ fontSize: 12, color: "#666" }}>
+                  e.g. rent, subscriptions, EMIs
+                </p>
+              </div>
+              <label style={{ position: "relative", width: 44, height: 24, cursor: "pointer" }}>
+                <input {...register("recurring")} type="checkbox"
+                  style={{ opacity: 0, width: 0, height: 0 }} />
+                <span style={{
+                  position: "absolute", inset: 0, borderRadius: 99,
+                  background: watch("recurring") ? "#e85d5d" : "#444",
+                  transition: "background 0.2s",
+                }} />
+                <span style={{
+                  position: "absolute", top: 3,
+                  left: watch("recurring") ? 23 : 3,
+                  width: 18, height: 18, borderRadius: "50%",
+                  background: "#fff", transition: "left 0.2s",
+                }} />
+              </label>
             </div>
-            <label style={{ position: "relative", width: 44, height: 24, cursor: "pointer" }}>
-              <input {...register("recurring")} type="checkbox"
-                style={{ opacity: 0, width: 0, height: 0 }} />
-              <span style={{
-                position: "absolute", inset: 0, borderRadius: 99,
-                background: watch("recurring") ? "#e85d5d" : "#444",
-                transition: "background 0.2s",
-              }} />
-              <span style={{
-                position: "absolute", top: 3,
-                left: watch("recurring") ? 23 : 3,
-                width: 18, height: 18, borderRadius: "50%",
-                background: "#fff", transition: "left 0.2s",
-              }} />
-            </label>
+
+            {watch("recurring") && (
+              <div style={{ marginTop: 14, borderTop: "1px solid #3a3a3a", paddingTop: 14 }}>
+                <p style={{ fontSize: 12, color: "#888", marginBottom: 8 }}>Frequency</p>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                  {FREQUENCIES.map((f) => {
+                    const selected = watch("recurringFrequency") === f;
+                    return (
+                      <button key={f} type="button"
+                        onClick={() => setValue("recurringFrequency", f)}
+                        style={{
+                          padding: "8px 4px", borderRadius: 8, border: "1px solid",
+                          borderColor: selected ? "#e85d5d" : "#444",
+                          background: selected ? "#e85d5d22" : "transparent",
+                          color: selected ? "#e85d5d" : "#888",
+                          fontSize: 12, fontWeight: selected ? 600 : 400,
+                          cursor: "pointer", textTransform: "capitalize",
+                          transition: "all 0.15s",
+                        }}>
+                        {f}
+                      </button>
+                    );
+                  })}
+                </div>
+                {errors.recurringFrequency && (
+                  <p className="error-text">{errors.recurringFrequency.message}</p>
+                )}
+
+                {watch("recurringFrequency") === "custom" && (
+                  <div style={{ marginTop: 10 }}>
+                    <p style={{ fontSize: 12, color: "#888", marginBottom: 6 }}>Every N days</p>
+                    <input {...register("recurringInterval")} type="number" min="1"
+                      placeholder="e.g. 14"
+                      style={{
+                        width: "100%", background: "#1e1e1e", border: "1px solid #444",
+                        borderRadius: 8, padding: "10px 12px", color: "#fff",
+                        fontSize: 14, outline: "none",
+                      }} />
+                    {errors.recurringInterval && (
+                      <p className="error-text">{errors.recurringInterval.message}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Submit */}

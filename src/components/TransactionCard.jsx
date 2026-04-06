@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO } from "date-fns";
 import { MdEdit, MdDelete, MdRepeat } from "react-icons/md";
 import { toast } from "react-toastify";
 import { useFinance } from "../context/FinanceContext";
@@ -52,6 +51,13 @@ export default function TransactionCard({ transaction }) {
         </div>
         <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
           {transaction.category}
+          {transaction.recurring && transaction.recurringFrequency && (
+            <span style={{ color: "#888" }}>
+              {` · ${transaction.recurringFrequency === "custom"
+                ? `every ${transaction.recurringInterval}d`
+                : transaction.recurringFrequency}`}
+            </span>
+          )}
           {transaction.notes && ` · ${transaction.notes}`}
         </div>
       </div>
@@ -63,9 +69,6 @@ export default function TransactionCard({ transaction }) {
           color: isExpense ? "#e85d5d" : "#4a90d9",
         }}>
           {isExpense ? "- " : "+ "}{fmt(transaction.amount)}
-        </div>
-        <div style={{ fontSize: 11, color: "#555", marginTop: 2 }}>
-          {format(parseISO(transaction.date), "hh:mm a")}
         </div>
       </div>
 

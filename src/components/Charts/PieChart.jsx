@@ -1,8 +1,9 @@
 import { PieChart as RechartsPie, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { CATEGORIES } from "../../constants/categories";
-import { formatINR } from "../../utils/currencyFormatter";
+import { useFinance } from "../../context/FinanceContext";
 
 export default function PieChart({ transactions }) {
+  const { fmt } = useFinance();
   const data = CATEGORIES.map((cat) => ({
     name: cat.name,
     value: transactions
@@ -30,7 +31,7 @@ export default function PieChart({ transactions }) {
           ))}
         </Pie>
         <Tooltip
-          formatter={(value) => formatINR(value)}
+          formatter={(value) => fmt(value)}
           contentStyle={{ background: "#242424", border: "1px solid #333",
             borderRadius: 8, color: "#fff" }}
         />

@@ -1,9 +1,10 @@
 import { LineChart as RechartsLine, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid } from "recharts";
 import { format, startOfMonth } from "date-fns";
-import { formatINR } from "../../utils/currencyFormatter";
+import { useFinance } from "../../context/FinanceContext";
 
 export default function LineChart({ transactions }) {
+  const { fmt } = useFinance();
   const months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - (5 - i));
@@ -25,9 +26,9 @@ export default function LineChart({ transactions }) {
         <XAxis dataKey="month" tick={{ fill: "#666", fontSize: 12 }}
           axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: "#666", fontSize: 11 }} axisLine={false} tickLine={false}
-          tickFormatter={(v) => `₹${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+          tickFormatter={(v) => fmt(v)} />
         <Tooltip
-          formatter={(value) => formatINR(value)}
+          formatter={(value) => fmt(value)}
           contentStyle={{ background: "#242424", border: "1px solid #333",
             borderRadius: 8, color: "#fff" }}
         />

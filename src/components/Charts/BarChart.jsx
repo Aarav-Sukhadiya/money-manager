@@ -1,9 +1,10 @@
 import { BarChart as RechartsBar, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, Legend, CartesianGrid } from "recharts";
-import { format, parseISO, startOfMonth } from "date-fns";
-import { formatINR } from "../../utils/currencyFormatter";
+import { format, startOfMonth } from "date-fns";
+import { useFinance } from "../../context/FinanceContext";
 
 export default function BarChart({ transactions }) {
+  const { fmt } = useFinance();
   // Build last 6 months of income vs expense
   const months = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
@@ -28,9 +29,9 @@ export default function BarChart({ transactions }) {
         <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
         <XAxis dataKey="month" tick={{ fill: "#666", fontSize: 12 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: "#666", fontSize: 11 }} axisLine={false} tickLine={false}
-          tickFormatter={(v) => `₹${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+          tickFormatter={(v) => fmt(v)} />
         <Tooltip
-          formatter={(value) => formatINR(value)}
+          formatter={(value) => fmt(value)}
           contentStyle={{ background: "#242424", border: "1px solid #333",
             borderRadius: 8, color: "#fff" }}
         />
