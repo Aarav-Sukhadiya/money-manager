@@ -11,18 +11,20 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app-shell">
-        <AnimatePresence mode="wait">
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/transactions/new" element={<AddTransaction />} />
-            <Route path="/transactions/edit/:id" element={<AddTransaction />} />
-            <Route path="/budget" element={<Budget />} />
-            <Route path="/analytics" element={<Analytics />} />
-          </Routes>
-        </AnimatePresence>
         <BottomNav />
+        <div className="main-area">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/transactions/new" element={<AddTransaction />} />
+              <Route path="/transactions/edit/:id" element={<AddTransaction />} />
+              <Route path="/budget" element={<Budget />} />
+              <Route path="/analytics" element={<Analytics />} />
+            </Routes>
+          </AnimatePresence>
+        </div>
       </div>
     </BrowserRouter>
   );

@@ -27,13 +27,39 @@ body {
   color: var(--text-primary);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
-  max-width: 480px;
-  margin: 0 auto;
 }
 
+/* ── Mobile shell: centered, capped at 480px ── */
 .app-shell {
   min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
   padding-bottom: 72px; /* space for bottom nav */
+}
+
+/* ── Desktop shell: sidebar + content ── */
+@media (min-width: 768px) {
+  .app-shell {
+    max-width: 100%;
+    margin: 0;
+    padding-bottom: 0;
+    padding-left: 240px; /* sidebar width */
+  }
+
+  .main-area {
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .page {
+    padding: 0 32px 40px;
+  }
+
+  .fab {
+    bottom: 28px;
+    right: 28px;
+  }
 }
 
 /* Page wrapper for framer-motion */
@@ -163,3 +189,90 @@ body {
 .text-muted   { color: var(--text-secondary); }
 .text-sm      { font-size: 13px; }
 .text-xs      { font-size: 11px; }
+
+/* ── Bottom Nav (mobile) / Sidebar Nav (desktop) ── */
+.app-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: #1e1e1e;
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 64px;
+  z-index: 50;
+}
+
+.nav-logo {
+  display: none;
+}
+
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-decoration: none;
+  font-size: 11px;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.nav-link.active {
+  color: var(--accent-red);
+}
+
+@media (min-width: 768px) {
+  .app-nav {
+    left: 0;
+    top: 0;
+    bottom: auto;
+    transform: none;
+    width: 240px;
+    max-width: 240px;
+    height: 100vh;
+    border-top: none;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0 8px 24px;
+    gap: 2px;
+    align-items: stretch;
+  }
+
+  .nav-logo {
+    display: block;
+    padding: 20px 12px 20px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--accent-red);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+  }
+
+  .nav-link {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 11px 14px;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    color: var(--text-secondary);
+  }
+
+  .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+  }
+
+  .nav-link.active {
+    background: rgba(232, 93, 93, 0.12);
+    color: var(--accent-red);
+  }
+}
